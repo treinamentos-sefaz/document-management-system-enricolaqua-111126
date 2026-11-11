@@ -10,6 +10,29 @@ class DocumentServiceError extends Error {
   }
 }
 
+async function withStorageError(operation, message) {
+  try {
+    return await operation();
+  } catch {
+    throw new DocumentServiceError(500, 'STORAGE_ERROR', message);
+  }
+}
+
+async function removeUploadedFile(filename) {
+  try {
+    await documentRepository.removeStoredFile(filename);
+  } catch {}
+}
+
+async function registerDocument(document) {
+  try {
+    return documentRepository.createDocument(document);
+  } catch (error) {
+    await removeUploadedFile(document.storedFilename);
+    throw error;
+  }
+}
+
 async function uploadDocument(file) {
   if (!file) {
     throw new DocumentServiceError(400, 'FILE_REQUIRED', 'Envie um arquivo no campo file.');
@@ -25,15 +48,10 @@ async function uploadDocument(file) {
     storedFilename: file.filename
   };
 
-  try {
-    return documentRepository.createDocument(document);
-  } catch (error) {
-    try {
-      await documentRepository.removeStoredFile(file.filename);
-    } catch {}
-
-    throw new DocumentServiceError(500, 'STORAGE_ERROR', 'Não foi possível registrar o documento.');
-  }
+  return withStorageError(
+    () => registerDocument(document),
+    'Não foi possível registrar o documento.'
+  );
 }
 
 function listDocuments() {
@@ -41,21 +59,16 @@ function listDocuments() {
 }
 
 async function getDownload(id) {
-  try {
-    const download = await documentRepository.findDownloadById(id);
+  const download = await withStorageError(
+    () => documentRepository.findDownloadById(id),
+    'Não foi possível acessar o documento.'
+  );
 
-    if (!download) {
-      throw new DocumentServiceError(404, 'DOCUMENT_NOT_FOUND', 'Documento não encontrado.');
-    }
-
-    return download;
-  } catch (error) {
-    if (error instanceof DocumentServiceError) {
-      throw error;
-    }
-
-    throw new DocumentServiceError(500, 'STORAGE_ERROR', 'Não foi possível acessar o documento.');
+  if (!download) {
+    throw new DocumentServiceError(404, 'DOCUMENT_NOT_FOUND', 'Documento não encontrado.');
   }
+
+  return download;
 }
 
 module.exports = {
