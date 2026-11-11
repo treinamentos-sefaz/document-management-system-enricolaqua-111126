@@ -99,6 +99,24 @@ h1 { margin-bottom: 15px; font: 400 46px/1.08 Georgia, "Times New Roman", serif;
 .download-error { max-width: 180px; font-size: 10px; text-align: right; }
 .footer { min-height: 58px; border-top: 1px solid rgba(23, 42, 43, .1); border-bottom: 0; color: var(--muted); font-size: 11px; }
 
+.auth-content { display: grid; width: min(100% - 40px, 860px); grid-template-columns: 1fr minmax(280px, 390px); align-items: center; gap: clamp(32px, 8vw, 100px); margin: 0 auto; padding: 90px 0; }
+.auth-intro h1 { margin-bottom: 18px; }
+.auth-intro > p:last-child { max-width: 380px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.auth-panel { border: 1px solid var(--line); border-top: 3px solid var(--green); background: var(--paper); box-shadow: 0 12px 30px rgba(32, 68, 57, .045); }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+.auth-tab { min-height: 48px; border: 0; border-bottom: 2px solid transparent; color: var(--muted); background: transparent; cursor: pointer; font-size: 12px; font-weight: 650; }
+.auth-tab.active { border-bottom-color: var(--green); color: var(--green-dark); }
+.auth-form { display: grid; gap: 10px; padding: 25px; }
+.auth-form h2 { margin: 0 0 9px; font: 400 24px Georgia, "Times New Roman", serif; }
+.auth-form label { margin-top: 7px; color: var(--ink); font-size: 12px; font-weight: 650; }
+.auth-form input { width: 100%; min-height: 42px; padding: 0 11px; border: 1px solid #cbd9d2; border-radius: 0; color: var(--ink); background: #fff; }
+.auth-form input:focus { border-color: var(--green); outline: 2px solid rgba(14, 101, 91, .16); }
+.auth-hint { margin: 0; color: var(--muted); font-size: 11px; }
+.auth-submit { width: 100%; margin-top: 12px; }
+.logout-button { padding: 8px 11px; border: 1px solid var(--line); color: var(--green-dark); background: #fff; cursor: pointer; font-size: 12px; }
+.logout-button:hover { background: var(--mint); }
+.auth-shell .footer { border-top: 1px solid rgba(23, 42, 43, .1); }
+
 @media (max-width: 600px) {
   .topbar, .footer { min-height: 60px; padding-right: 20px; padding-left: 20px; }
   .content { width: min(100% - 32px, 860px); padding-top: 46px; padding-bottom: 58px; }
@@ -114,4 +132,9 @@ h1 { margin-bottom: 15px; font: 400 46px/1.08 Georgia, "Times New Roman", serif;
   .download-button > span { font-size: 19px; }
   .download-error { max-width: 110px; }
   .footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 5px; }
+  .auth-content { width: min(100% - 32px, 500px); grid-template-columns: 1fr; gap: 27px; padding: 47px 0 56px; }
+  .auth-intro { margin-bottom: 0; }
+  .auth-intro h1 { font-size: 37px; }
+  .auth-form { padding: 22px 18px; }
+  .auth-shell .footer { min-height: 66px; }
 }

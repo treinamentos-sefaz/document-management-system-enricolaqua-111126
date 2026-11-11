@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { downloadDocument } from '../services/api.js';
 
-export function DownloadButton({ documentId, fileName }) {
+export function DownloadButton({ documentId, fileName, token }) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState('');
 
@@ -10,7 +10,7 @@ export function DownloadButton({ documentId, fileName }) {
     setError('');
 
     try {
-      const blob = await downloadDocument(documentId);
+      const blob = await downloadDocument(documentId, token);
       const objectUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = objectUrl;

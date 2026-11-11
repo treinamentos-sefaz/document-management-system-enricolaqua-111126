@@ -33,9 +33,13 @@ async function registerDocument(document) {
   }
 }
 
-async function uploadDocument(file) {
+async function uploadDocument(file, ownerId) {
   if (!file) {
     throw new DocumentServiceError(400, 'FILE_REQUIRED', 'Envie um arquivo no campo file.');
+  }
+
+  if (typeof ownerId !== 'string' || ownerId.length === 0) {
+    throw new DocumentServiceError(401, 'AUTH_REQUIRED', 'Autentique-se para enviar documentos.');
   }
 
   const document = {
@@ -43,7 +47,7 @@ async function uploadDocument(file) {
     originalName: file.originalname,
     size: file.size,
     uploadedAt: new Date().toISOString(),
-    owner: 'demo-user',
+    owner: ownerId,
     mimeType: file.mimetype || 'application/octet-stream',
     storedFilename: file.filename
   };
@@ -54,13 +58,13 @@ async function uploadDocument(file) {
   );
 }
 
-function listDocuments() {
-  return documentRepository.listDocuments();
+function listDocuments(ownerId) {
+  return documentRepository.listDocuments(ownerId);
 }
 
-async function getDownload(id) {
+async function getDownload(id, ownerId) {
   const download = await withStorageError(
-    () => documentRepository.findDownloadById(id),
+    () => documentRepository.findDownloadById(id, ownerId),
     'Não foi possível acessar o documento.'
   );
 

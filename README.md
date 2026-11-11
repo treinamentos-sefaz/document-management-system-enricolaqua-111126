@@ -33,5 +33,18 @@
 
 ---
 
+## Autenticação local
+
+O backend exige `JWT_SECRET` com pelo menos 32 bytes. Gere um segredo exclusivo para o ambiente e configure-o antes de iniciar o servidor:
+
+```bash
+export JWT_SECRET="$(openssl rand -hex 32)"
+cd backend
+npm ci
+npm start
+```
+
+Os usuários e hashes de senha são gravados localmente em `backend/storage/users.json`; os arquivos enviados permanecem em `backend/storage`. A interface React inicia separadamente com `cd frontend && npm ci && npm run dev`. Tokens duram uma hora e ficam somente na memória da página; após recarregar, entre novamente.
+
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
 

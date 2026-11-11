@@ -9,16 +9,16 @@ const DOCUMENT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f
 
 async function upload(req, res, next) {
   try {
-    const document = await documentService.uploadDocument(req.file);
+    const document = await documentService.uploadDocument(req.file, req.user.id);
     res.status(201).json({ document });
   } catch (error) {
     next(error);
   }
 }
 
-function list(_req, res, next) {
+function list(req, res, next) {
   try {
-    res.json({ documents: documentService.listDocuments() });
+    res.json({ documents: documentService.listDocuments(req.user.id) });
   } catch (error) {
     next(error);
   }
@@ -30,7 +30,7 @@ async function download(req, res, next) {
   }
 
   try {
-    const { document, filePath } = await documentService.getDownload(req.params.id);
+    const { document, filePath } = await documentService.getDownload(req.params.id, req.user.id);
     const fileStream = fs.createReadStream(filePath);
 
     await once(fileStream, 'open');

@@ -39,16 +39,17 @@ function createDocument(document) {
   return toPublicDocument(document);
 }
 
-function listDocuments() {
+function listDocuments(ownerId) {
   return [...documents.values()]
+    .filter((document) => document.owner === ownerId)
     .sort((left, right) => right.uploadedAt.localeCompare(left.uploadedAt))
     .map(toPublicDocument);
 }
 
-async function findDownloadById(id) {
+async function findDownloadById(id, ownerId) {
   const document = documents.get(id);
 
-  if (!document) {
+  if (!document || document.owner !== ownerId) {
     return null;
   }
 

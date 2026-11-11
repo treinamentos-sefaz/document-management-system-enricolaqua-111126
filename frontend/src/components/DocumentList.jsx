@@ -30,7 +30,7 @@ function getFileExtension(fileName) {
   return extension && extension !== fileName ? extension.slice(0, 5).toUpperCase() : 'FILE';
 }
 
-export function DocumentList({ documents, error, isLoading, onRefresh }) {
+export function DocumentList({ documents, error, isLoading, onRefresh, token }) {
   return (
     <section className="documents-section" aria-labelledby="documents-title">
       <div className="section-heading documents-heading">
@@ -80,7 +80,7 @@ export function DocumentList({ documents, error, isLoading, onRefresh }) {
                   <strong className="document-name" title={item.originalName}>{item.originalName}</strong>
                   <span>{formatFileSize(item.size)} <span className="metadata-separator">·</span> {formatDate(item.uploadedAt)}</span>
                 </div>
-                <DownloadButton documentId={item.id} fileName={item.originalName} />
+                <DownloadButton documentId={item.id} fileName={item.originalName} token={token} />
               </li>
             ))}
           </ul>

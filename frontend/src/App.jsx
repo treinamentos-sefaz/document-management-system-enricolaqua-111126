@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { DocumentList } from './components/DocumentList.jsx';
+import { AuthForm } from './components/AuthForm.jsx';
 import { UploadComponent } from './components/UploadComponent.jsx';
 import { listDocuments, uploadDocument } from './services/api.js';
 import './App.css';
 
 export default function App() {
+  const [session, setSession] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -14,6 +16,13 @@ export default function App() {
   const [refreshVersion, setRefreshVersion] = useState(0);
 
   useEffect(() => {
+    if (!session) {
+      setDocuments([]);
+      setIsLoading(false);
+      setLoadError('');
+      return undefined;
+    }
+
     const controller = new AbortController();
 
     async function loadDocuments() {
@@ -21,7 +30,7 @@ export default function App() {
       setLoadError('');
 
       try {
-        const result = await listDocuments({ signal: controller.signal });
+        const result = await listDocuments({ signal: controller.signal, token: session.token });
         setDocuments(result);
       } catch (error) {
         if (error.name !== 'AbortError') {
@@ -36,7 +45,7 @@ export default function App() {
 
     loadDocuments();
     return () => controller.abort();
-  }, [refreshVersion]);
+  }, [refreshVersion, session]);
 
   async function handleUpload(file) {
     setUploadError('');
@@ -44,7 +53,7 @@ export default function App() {
     setIsUploading(true);
 
     try {
-      const document = await uploadDocument(file);
+      const document = await uploadDocument(file, session.token);
       setNotice(`${document.originalName} foi enviado.`);
       setRefreshVersion((version) => version + 1);
       return true;
@@ -60,6 +69,10 @@ export default function App() {
     setRefreshVersion((version) => version + 1);
   }
 
+  if (!session) {
+    return <AuthForm onAuthenticated={setSession} />;
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -69,8 +82,11 @@ export default function App() {
         </a>
         <span className="workspace-label">
           <span className="status-dot" aria-hidden="true" />
-          Biblioteca local
+          {session.user.username}
         </span>
+        <button className="logout-button" type="button" onClick={() => setSession(null)}>
+          Sair
+        </button>
       </header>
 
       <div className="content" id="top">
@@ -103,6 +119,7 @@ export default function App() {
           error={loadError}
           isLoading={isLoading}
           onRefresh={refreshDocuments}
+          token={session.token}
         />
       </div>
 

@@ -17,6 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "5.2.1",
-    "multer": "2.2.0"
+    "express-rate-limit": "^8.7.4",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "2.5.0"
   }
 }
