@@ -60,6 +60,8 @@ test('a API permite enviar, listar e baixar documentos', async (context) => {
   });
   assert.equal(oversizedResponse.status, 413);
   assert.equal((await oversizedResponse.json()).error.code, 'FILE_TOO_LARGE');
+  const filesAfterRejectedUpload = await fs.readdir(storageDirectory);
+  assert.deepEqual(filesAfterRejectedUpload.filter((filename) => !initialFiles.has(filename)), []);
 
   const uploadForm = new FormData();
   uploadForm.append('file', new Blob(['document contents'], { type: 'text/plain' }), 'sample.txt');
@@ -89,7 +91,17 @@ test('a API permite enviar, listar e baixar documentos', async (context) => {
   assert.match(downloadResponse.headers.get('content-type'), /^text\/plain(?:;|$)/);
   assert.equal(await downloadResponse.text(), 'document contents');
 
-  const notFoundResponse = await fetch(`${baseUrl}/documents/unknown/download`);
+  const unknownId = '00000000-0000-4000-8000-000000000001';
+  const notFoundResponse = await fetch(`${baseUrl}/documents/${unknownId}/download`);
   assert.equal(notFoundResponse.status, 404);
   assert.equal((await notFoundResponse.json()).error.code, 'DOCUMENT_NOT_FOUND');
+
+  const traversalId = encodeURIComponent('../../etc/passwd');
+  const traversalResponse = await fetch(`${baseUrl}/documents/${traversalId}/download`);
+  assert.equal(traversalResponse.status, 400);
+  assert.equal((await traversalResponse.json()).error.code, 'INVALID_DOCUMENT_ID');
+
+  const invalidIdResponse = await fetch(`${baseUrl}/documents/not-a-uuid/download`);
+  assert.equal(invalidIdResponse.status, 400);
+  assert.equal((await invalidIdResponse.json()).error.code, 'INVALID_DOCUMENT_ID');
 });
